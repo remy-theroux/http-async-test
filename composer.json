@@ -1,0 +1,24 @@
+{
+    "name": "remy-theroux/php-async-test",
+    "description": "Test asyn HTTP requests",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Rémy Théroux",
+            "email": "remy.theroux@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/console": "^4.1",
+        "php": "^7.1",
+        "amphp/amp": "^2.0",
+        "guzzlehttp/guzzle": "^6.3",
+        "amphp/artax": "^3.0",
+        "symfony/stopwatch": "^4.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}
