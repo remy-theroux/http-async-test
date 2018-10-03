@@ -34,19 +34,19 @@ class GuzzleSyncTester implements HttpRequestTestable
 
     /**
      * @param string $uri
-     * @param int    $requestNumber
+     * @param int    $iterations
      *
      * @return Result
      */
-    public function test(string $uri, int $requestNumber): Result
+    public function test(string $uri, int $iterations): Result
     {
         $status = [];
         $this->watcher->start(self::EVENT_NAME);
-        for ($i = 0;$i < $requestNumber;$i++) {
+        for ($i = 0;$i < $iterations;$i++) {
             try {
                 $response = $this->httpClient->request('GET', $uri);
                 $status[] = $response->getStatusCode();
-            } catch (\Exception $error) {
+            } catch (\Throwable $error) {
                 $status[] = '500';
             }
         }

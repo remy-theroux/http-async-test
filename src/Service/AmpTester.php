@@ -37,20 +37,20 @@ class AmpTester implements HttpRequestTestable
 
     /**
      * @param string $uri
-     * @param int    $requestNumber
+     * @param int    $iterations
      *
      * @return Result
      */
-    public function test(string $uri, int $requestNumber): Result
+    public function test(string $uri, int $iterations): Result
     {
         $status = [];
         $this->watcher->start(self::EVENT_NAME);
         Loop::run(
-            function () use ($uri, $requestNumber, &$status) {
+            function () use ($uri, $iterations, &$status) {
                 $this->httpClient->setOption(Client::OP_DISCARD_BODY, true);
 
                 try {
-                    for ($i = 0; $i < $requestNumber; $i++) {
+                    for ($i = 0; $i < $iterations; $i++) {
                         $promises[] = $this->httpClient->request($uri);
                     }
 

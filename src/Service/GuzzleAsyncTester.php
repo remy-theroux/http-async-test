@@ -34,16 +34,16 @@ class GuzzleAsyncTester
 
     /**
      * @param string $uri
-     * @param int    $requestNumber
+     * @param int    $iterations
      *
      * @return Result
      */
-    public function test(string $uri, int $requestNumber): Result
+    public function test(string $uri, int $iterations): Result
     {
         $status = [];
         $promises = [];
         $this->watcher->start(self::EVENT_NAME);
-        for ($i = 0; $i < $requestNumber; $i++) {
+        for ($i = 0; $i < $iterations; $i++) {
             $promises[] = $this->httpClient->getAsync($uri);
         }
 

@@ -48,8 +48,7 @@ class BenchmarkRequestsCommand extends Command
         $this
             ->setName('benchmark')
             ->setDescription('Benchmarks multiple http requests.')
-            ->setHelp('Use --requests option to indicate requests number to benchmarks.')
-            ->addOption('requests', 'r', InputOption::VALUE_OPTIONAL, 'Indicates number of requests', self::DEFAULT_REQUESTS_NUMBER)
+            ->addOption('iterations', 'i', InputOption::VALUE_OPTIONAL, 'Indicates number of request iterations', self::DEFAULT_REQUESTS_NUMBER)
             ->addOption('uri', 'u', InputOption::VALUE_OPTIONAL, 'URI that will be requested (GET request)', self::DEFAULT_URI);
     }
 
@@ -61,12 +60,12 @@ class BenchmarkRequestsCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $requestNumber = (int) $input->getOption('requests');
-        $uri           = $input->getOption('uri');
+        $iterations = (int) $input->getOption('iterations');
+        $uri        = $input->getOption('uri');
 
-        $guzzleSyncResult  = $this->guzzleSyncTester->test($uri, $requestNumber);
-        $guzzleAsyncResult = $this->guzzleAsyncTester->test($uri, $requestNumber);
-        $ampResult         = $this->ampTester->test($uri, $requestNumber);
+        $guzzleSyncResult  = $this->guzzleSyncTester->test($uri, $iterations);
+        $guzzleAsyncResult = $this->guzzleAsyncTester->test($uri, $iterations);
+        $ampResult         = $this->ampTester->test($uri, $iterations);
 
         $table = new Table($output);
         $table->setHeaders(['Method ', 'Duration', 'Requests OK', 'Requests ERROR'])->setRows(
