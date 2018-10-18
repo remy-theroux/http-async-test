@@ -17,7 +17,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 class BenchmarkRequestsCommand extends Command
 {
     private const DEFAULT_REQUESTS_NUMBER = 20;
-    private const DEFAULT_URI = 'https://www.google.com';
+    private const DEFAULT_URI = 'https://httpstat.us/200?sleep=1500';
 
     /** @var AmpTester  */
     private $ampTester;
