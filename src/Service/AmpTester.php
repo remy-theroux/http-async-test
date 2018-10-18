@@ -6,9 +6,11 @@ namespace App\Service;
 use Amp\Artax\Client;
 use Amp\Artax\DefaultClient;
 use Amp\Artax\HttpException;
-use Amp\Loop;
 use App\Model\Result;
 use Symfony\Component\Stopwatch\Stopwatch;
+use function Amp\call;
+use function Amp\Promise\all;
+use function Amp\Promise\wait;
 
 /**
  *
@@ -43,27 +45,29 @@ class AmpTester implements HttpRequestTestable
      */
     public function test(string $uri, int $iterations): Result
     {
-        $status = [];
         $this->watcher->start(self::EVENT_NAME);
-        Loop::run(
-            function () use ($uri, $iterations, &$status) {
-                $this->httpClient->setOption(Client::OP_DISCARD_BODY, true);
 
-                try {
-                    for ($i = 0; $i < $iterations; $i++) {
-                        $promises[] = $this->httpClient->request($uri);
-                    }
+        $this->httpClient->setOption(Client::OP_DISCARD_BODY, true);
+        $client   = $this->httpClient;
+        $promises = [];
 
-                    $responses = yield $promises;
+        for ($i = 0; $i < $iterations; $i++) {
+            $promises[] = call(
+                function () use ($client, $uri) {
+                    // "yield" inside a coroutine awaits the resolution of the promise returned from Client::request(). The generator is then continued.
+                    $response = yield $client->request($uri);
 
-                    foreach ($responses as $response) {
-                        $status[] = $response->getStatus();
-                    }
-                } catch (HttpException $error) {
-                    $status[] = $error->getCode();
+                    // Same for the body here. Yielding an Amp\ByteStream\Message buffers the entire message.
+                    return $response->getStatus();
                 }
-            }
-        );
+            );
+        }
+
+        try {
+            $status = wait(all($promises));
+        } catch (\Exception $error) {
+            var_dump($error->getMessage());
+        }
         $event = $this->watcher->stop(self::EVENT_NAME);
 
         $result                 = new Result();
