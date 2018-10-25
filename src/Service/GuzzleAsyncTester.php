@@ -5,10 +5,9 @@ namespace App\Service;
 
 use App\Model\Result;
 use GuzzleHttp\Client;
-use function GuzzleHttp\Promise\all;
+use function GuzzleHttp\Promise\each;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\Stopwatch\Stopwatch;
-
 
 class GuzzleAsyncTester
 {
@@ -40,19 +39,22 @@ class GuzzleAsyncTester
      */
     public function test(string $uri, int $iterations): Result
     {
-        $status = [];
+        $status   = [];
         $promises = [];
         $this->watcher->start(self::EVENT_NAME);
         for ($i = 0; $i < $iterations; $i++) {
             $promises[] = $this->httpClient->getAsync($uri);
         }
 
-        all($promises)->then(function (array $responses) use (&$status) {
-            /** @var Response $response */
-            foreach ($responses as $response) {
-                $status[] = $response->getStatusCode();
+        each(
+            $promises,
+            function ($response, $idx) use (&$status) {
+                $status[$idx] = $response->getStatusCode();
+            },
+            function ($reason, $idx) use (&$status) {
+                $status[$idx] = $reason->getResponse()->getStatusCode();
             }
-        })->wait();
+        )->wait();
 
         $event = $this->watcher->stop(self::EVENT_NAME);
 

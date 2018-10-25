@@ -63,12 +63,8 @@ class AmpTester implements HttpRequestTestable
             );
         }
 
-        try {
-            $status = wait(all($promises));
-        } catch (\Exception $error) {
-            var_dump($error->getMessage());
-        }
-        $event = $this->watcher->stop(self::EVENT_NAME);
+        $status = wait(all($promises));
+        $event  = $this->watcher->stop(self::EVENT_NAME);
 
         $result                 = new Result();
         $result->responseStatus = $status;
